@@ -112,12 +112,12 @@ where t.id_suporte = s.id_suporte and t.id_editora = e.id_editora and s.nome = '
 select sum(t.PRECO) as Patrimonio from TITULO t;
 
 -- s) Qual a editora na qual o colecionador investiu mais dinheiro?
-
-select e.nome as Nome,sum(t.preco) as Total
+select e.nome as Nome
 from titulo t, editora e 
 where t.id_editora = e.id_editora
 group by t.id_editora, e.nome
-order by Total desc;
+order by sum(t.preco) desc
+fetch first 1 rows only;
 
 -- t) Qual a editora que possui mais títulos de “Heavy Metal” na coleção? Quanto titulo possui essa editora?
 select e.nome as Editora, count(e.id_editora) as "Número de títulos" from titulo t 
