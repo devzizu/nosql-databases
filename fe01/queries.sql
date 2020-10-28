@@ -11,8 +11,7 @@ select count(*) from musica;
 select count(*) from autor;
 
 -- d) Quantas editoras distintas existem na coleção?
-
-select distinct count(nome) from editora;
+select count(distinct(e.id_editora)) from editora e;
 
 -- e) O autor "Max Changmin" é o principal autor de quantos títulos?
 
