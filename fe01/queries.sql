@@ -120,12 +120,12 @@ group by t.id_editora, e.nome
 order by Total desc;
 
 -- t) Qual a editora que possui mais títulos de “Heavy Metal” na coleção? Quanto titulo possui essa editora?
-
-select e.nome as Editora, count(e.id_editora) from titulo t 
+select e.nome as Editora, count(e.id_editora) as "Número de títulos" from titulo t 
 inner join GENERO g
 on g.ID_GENERO = t.ID_GENERO
 inner join EDITORA e
 on e.ID_EDITORA = t.ID_EDITORA
+where g.nome = 'Heavy Metal'
 group by e.nome
 order by count(e.id_editora) desc
 fetch first 1 rows only;
