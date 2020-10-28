@@ -1,12 +1,3 @@
-
-drop table musica;
-drop table review;
-drop table titulo;
-drop table suporte;
-drop table autor;
-drop table genero;
-drop table editora;
-
 CREATE TABLE autor
  (
      id_autor int NOT NULL ENABLE,
