@@ -62,7 +62,7 @@ order by r.dta_review asc;
 -- k) Quais os diversos autores das músicas do título lançado a ‘04-04-1970’ com o preço de 20€?
 
 select 
-    a.nome, t.titulo, t.dta_compra, t.preco
+    a.nome
 from autor a
 join titulo t on t.id_autor = a.id_autor
 where t.dta_compra = to_date('04-04-1970', 'dd-mm-yy')
