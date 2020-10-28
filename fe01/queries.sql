@@ -49,7 +49,7 @@ and t.preco = 12;
 
 select dta_review,conteudo from review join titulo on review.ID_TITULO=titulo.ID_TITULO where titulo='oh whoa oh';
 
--- j) Quais as reviews (data e classificação) existentes para o título “pump”, ordenadas por data da mais antiga para a mais recente
+-- j) Quais as reviews (data e classificação) existentes para o título “pump”, ordenadas por data da mais antiga para a mais recente?
 
 select
     t.titulo, r.dta_review, r.conteudo
