@@ -67,7 +67,7 @@ select
 from autor a
 join titulo t on t.id_autor = a.id_autor
 where t.dta_compra = to_date('04-04-1970', 'dd-mm-yy')
-and t.preco = 20;-- [l] Qual foi o total de dinheiro investido em compras de título da editora ‘EMI’?
+and t.preco = 20;
 
 -- l) Qual foi o total de dinheiro investido em compras de título da editora ‘EMI’?
 
