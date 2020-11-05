@@ -17,7 +17,7 @@ CREATE TABLE patient
 CREATE TABLE system
 (
 	systemid int NOT NULL ENABLE,
-    number_of_services int,
+    number_of_sensors int,
     CONSTRAINT SYSTEM_PK PRIMARY KEY (systemid)
 );
 
