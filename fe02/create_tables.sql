@@ -24,9 +24,7 @@ CREATE TABLE system
 create table careteam
 (
 	careteamid int not null enable,
-    systemid int not null enable,
-	constraint CARETEAM_PK primary key (careteamid),
-	CONSTRAINT SYSTEM_FK FOREIGN KEY (systemid) REFERENCES system(systemid) enable
+	constraint CARETEAM_PK primary key (careteamid)
 );
 
 CREATE TABLE careteam_has_doctor
