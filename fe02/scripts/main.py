@@ -10,15 +10,60 @@ import cx_Oracle
 import config
 import sqlite3
 
+from datetime import datetime
 from sqlite3 import OperationalError
 
 #saves the api loaded
 resultsDict = {}
 
+sql_insert = "insert into TABLE values (VALUES);"
+
 def main():
     os.system('cls' if os.name == 'nt' else 'clear')
-    connection = connect_oracle()
-    load_sql_file(connection, "../create_tables.sql")
+    #connection = connect_oracle()
+    #load_sql_file(connection, "../create_tables.sql")
+    load_api_to_dict()
+    load_datastructures()
+
+def load_datastructures():
+    
+    for key in resultsDict:
+        
+        for doc in resultsDict[key]["careteam"]:
+            doctor_val = "{}, \"{}\"".format(doc["id"], doc["nome"])
+            sql_doc = sql_insert.replace("TABLE", "doctor").replace("VALUES", doctor_val)
+            print(sql_doc)
+       
+        print("\n")
+        patient_val = "{}, \"{}\", {}, {}".format( \
+                    resultsDict[key]["patient"]["patientid"], \
+                    resultsDict[key]["patient"]["patientname"], \
+                    "to_date('{}', 'yyyy-mm-dd')" \
+                    .format(datetime.strptime(resultsDict[key]["patient"]["patientbirthdate"], "%Y-%m-%d")).replace(" 00:00:00", ""), \
+                    resultsDict[key]["patient"]["patientage"])
+        sql_patient = sql_insert.replace("TABLE", "patient").replace("VALUES", patient_val)
+        print(sql_patient)
+
+
+        sensor_val = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}" \
+                .format(resultsDict[key]["sensorid"], \
+                        "careteamid", \
+                        "patientid", \
+                        "systemid", \
+                        resultsDict[key]["sensornum"], \
+                        "\"{}\"".format(resultsDict[key]["type_of_sensor"]), \
+                        "\"{}\"".format(resultsDict[key]["servicecod"]), \
+                        "\"{}\"".format(resultsDict[key]["servicedesc"]), \
+                        "to_date('{}', 'yyyy-mm-dd')".format(datetime.strptime(resultsDict[key]["admdate"], "%Y-%m-%d")).replace(" 00:00:00", ""), \
+                        resultsDict[key]["bed"], \
+                        resultsDict[key]["bodytemp"], \
+                        resultsDict[key]["bloodpress"]["systolic"], \
+                        resultsDict[key]["bloodpress"]["diastolic"], \
+                        resultsDict[key]["bpm"], \
+                        resultsDict[key]["sato2"], \
+                        resultsDict[key]["timestamp"])
+        sql_sensor = sql_insert.replace("TABLE", "sensor").replace("VALUES", sensor_val)
+        print(sql_sensor,"\n\n")
 
 def load_tables(connection):
     print("\nLoading tables with data...")
@@ -68,6 +113,7 @@ def connect_oracle():
 
 
 def load_api_to_dict():
+    print("Loading API data...")
     range_min_sensor, range_max_sensor = 1, 6
     for requestID in range(range_min_sensor, range_max_sensor):
         url         = '{}{}{}'.format(config.base_api_url, config.sensor_api, requestID)
@@ -76,9 +122,6 @@ def load_api_to_dict():
         jsonString  = json.dumps(jsonRequest)
         jsonData    = json.loads(jsonString)
         resultsDict[requestID] = jsonData
-
-    for key in resultsDict:
-        print("\nkey: {} -> value: \n\n{};".format(key, resultsDict[key]))
 
 if __name__ == '__main__':
     main()
