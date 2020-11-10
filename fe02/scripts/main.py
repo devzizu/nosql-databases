@@ -20,40 +20,70 @@ sql_insert = "insert into TABLE values (VALUES);"
 
 def main():
     os.system('cls' if os.name == 'nt' else 'clear')
-    #connection = connect_oracle()
+    connection = connect_oracle()
     #load_sql_file(connection, "../create_tables.sql")
     load_api_to_dict()
-    load_datastructures()
+    load_datastructures_to_file("../povoamento.sql")
+    load_sql_file(connection, "../povoamento.sql")
 
-def load_datastructures():
-    
+def load_datastructures_to_file(file_name):
+
+    f = open(file_name, "w")
+
+    systemid = 1    
+    careteamid = 1
+    careteam_has_doctorid = 1
+
     for key in resultsDict:
-        
+
+        if careteamid == 1:
+            system_val = "{}, {}".format(systemid, resultsDict[key]["number_of_sensors"])
+
+        sql_system = sql_insert.replace("TABLE", "system").replace("VALUES", system_val)
+        f.write("{}\n".format(sql_system))
+
+        careteam_val = "{}".format(careteamid)
+        sql_careteam = sql_insert.replace("TABLE", "careteam").replace("VALUES", careteam_val)
+
+        f.write("{}\n".format(sql_careteam))
+
         for doc in resultsDict[key]["careteam"]:
-            doctor_val = "{}, \"{}\"".format(doc["id"], doc["nome"])
+
+            doctor_val = "{}, '{}'".format(doc["id"], doc["nome"])
             sql_doc = sql_insert.replace("TABLE", "doctor").replace("VALUES", doctor_val)
-            print(sql_doc)
-       
-        print("\n")
-        patient_val = "{}, \"{}\", {}, {}".format( \
+
+            f.write("{}\n".format(sql_doc))
+
+            careteam_has_doctor_val = "{}, {}, {}".format( \
+                careteam_has_doctorid, \
+                careteamid, \
+                doc["id"]
+            )
+
+            sql_careteam_has_doctor = sql_insert.replace("TABLE", "careteam_has_doctor").replace("VALUES", careteam_has_doctor_val)
+
+            f.write("{}\n".format(sql_careteam_has_doctor))
+
+        patient_val = "{}, '{}', {}, {}".format( \
                     resultsDict[key]["patient"]["patientid"], \
                     resultsDict[key]["patient"]["patientname"], \
                     "to_date('{}', 'yyyy-mm-dd')" \
                     .format(datetime.strptime(resultsDict[key]["patient"]["patientbirthdate"], "%Y-%m-%d")).replace(" 00:00:00", ""), \
                     resultsDict[key]["patient"]["patientage"])
-        sql_patient = sql_insert.replace("TABLE", "patient").replace("VALUES", patient_val)
-        print(sql_patient)
 
+        sql_patient = sql_insert.replace("TABLE", "patient").replace("VALUES", patient_val)
+
+        f.write("{}\n".format(sql_patient))
 
         sensor_val = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}" \
                 .format(resultsDict[key]["sensorid"], \
-                        "careteamid", \
-                        "patientid", \
-                        "systemid", \
+                        careteamid, \
+                        resultsDict[key]["patient"]["patientid"], \
+                        systemid, \
                         resultsDict[key]["sensornum"], \
-                        "\"{}\"".format(resultsDict[key]["type_of_sensor"]), \
-                        "\"{}\"".format(resultsDict[key]["servicecod"]), \
-                        "\"{}\"".format(resultsDict[key]["servicedesc"]), \
+                        "'{}'".format(resultsDict[key]["type_of_sensor"]), \
+                        "'{}'".format(resultsDict[key]["servicecod"]), \
+                        "'{}'".format(resultsDict[key]["servicedesc"]), \
                         "to_date('{}', 'yyyy-mm-dd')".format(datetime.strptime(resultsDict[key]["admdate"], "%Y-%m-%d")).replace(" 00:00:00", ""), \
                         resultsDict[key]["bed"], \
                         resultsDict[key]["bodytemp"], \
@@ -63,7 +93,14 @@ def load_datastructures():
                         resultsDict[key]["sato2"], \
                         resultsDict[key]["timestamp"])
         sql_sensor = sql_insert.replace("TABLE", "sensor").replace("VALUES", sensor_val)
-        print(sql_sensor,"\n\n")
+
+        f.write("{}\n".format(sql_sensor))
+
+
+        careteamid+=1
+        careteam_has_doctorid+=1
+
+    f.close()
 
 def load_tables(connection):
     print("\nLoading tables with data...")
@@ -84,7 +121,7 @@ def load_sql_file(connection, file_name):
         if len(cmd) < 2:
             continue
         cmd = cmd.replace("\n", "")
-        print("Executing sql statment (brief): \"{} (...)\"".format(cmd[0:40]))
+        print("Executing sql statment (brief): '{}'".format(cmd[0:40]))
         try:
             with connection.cursor() as cursor:
                 cursor.execute(cmd)
