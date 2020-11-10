@@ -1,8 +1,3 @@
-"""
-pip3 install requests
-python3 -m pip install cx_Oracle --upgrade
-"""
-
 import os
 import requests
 import json
@@ -14,19 +9,23 @@ from datetime import datetime
 from sqlite3 import OperationalError
 
 #saves the api loaded
-resultsDict = {}
-
-sql_insert = "insert into TABLE values (VALUES);"
+resultsDict          = {}
+create_tables_file   = "../create_tables.sql"
+drop_tabes_file      = "../drop_tables.sql"
+populate_tables_file = "../povoamento.sql"
+sql_insert           = "insert into TABLE values (VALUES);"
 
 def main():
     os.system('cls' if os.name == 'nt' else 'clear')
     connection = connect_oracle()
-    #load_sql_file(connection, "../create_tables.sql")
+    if connection == None:
+        print("Error connecting to oracleDB...")
     load_api_to_dict()
-    load_datastructures_to_file("../povoamento.sql")
-    load_sql_file(connection, "../povoamento.sql")
+    load_datastructures_to_file(populate_tables_file)
 
 def load_datastructures_to_file(file_name):
+    
+    print("Loading data structures...")
 
     f = open(file_name, "w")
 
@@ -35,11 +34,13 @@ def load_datastructures_to_file(file_name):
     careteam_has_doctorid = 1
 
     for key in resultsDict:
-
+        
+        # Create only one system (for now)
         if careteamid == 1:
             system_val = "{}, {}".format(systemid, resultsDict[key]["number_of_sensors"])
 
         sql_system = sql_insert.replace("TABLE", "system").replace("VALUES", system_val)
+        
         f.write("{}\n".format(sql_system))
 
         careteam_val = "{}".format(careteamid)
@@ -53,7 +54,7 @@ def load_datastructures_to_file(file_name):
             sql_doc = sql_insert.replace("TABLE", "doctor").replace("VALUES", doctor_val)
 
             f.write("{}\n".format(sql_doc))
-
+ 
             careteam_has_doctor_val = "{}, {}, {}".format( \
                 careteam_has_doctorid, \
                 careteamid, \
@@ -63,6 +64,8 @@ def load_datastructures_to_file(file_name):
             sql_careteam_has_doctor = sql_insert.replace("TABLE", "careteam_has_doctor").replace("VALUES", careteam_has_doctor_val)
 
             f.write("{}\n".format(sql_careteam_has_doctor))
+            
+            careteam_has_doctorid+=1
 
         patient_val = "{}, '{}', {}, {}".format( \
                     resultsDict[key]["patient"]["patientid"], \
@@ -75,7 +78,7 @@ def load_datastructures_to_file(file_name):
 
         f.write("{}\n".format(sql_patient))
 
-        sensor_val = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}" \
+        sensor_val = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}" \
                 .format(resultsDict[key]["sensorid"], \
                         careteamid, \
                         resultsDict[key]["patient"]["patientid"], \
@@ -91,16 +94,17 @@ def load_datastructures_to_file(file_name):
                         resultsDict[key]["bloodpress"]["diastolic"], \
                         resultsDict[key]["bpm"], \
                         resultsDict[key]["sato2"], \
-                        resultsDict[key]["timestamp"])
+                        "to_timestamp('{}', 'YYYY-MM-DD HH24:MI:SS')".format(resultsDict[key]["timestamp"]))
         sql_sensor = sql_insert.replace("TABLE", "sensor").replace("VALUES", sensor_val)
 
         f.write("{}\n".format(sql_sensor))
 
 
         careteamid+=1
-        careteam_has_doctorid+=1
 
     f.close()
+
+    print("SQL file generated ('", populate_tables_file, "')!")
 
 def load_tables(connection):
     print("\nLoading tables with data...")
@@ -145,8 +149,8 @@ def connect_oracle():
         return oracledb_connection;
 
     except cx_Oracle.Error as error:
-        print("Error while connecting to OracleDB (check error below):")
-        print(error)
+        print("\tError while connecting to OracleDB (check error below):")
+        print("\t", error)
 
 
 def load_api_to_dict():
