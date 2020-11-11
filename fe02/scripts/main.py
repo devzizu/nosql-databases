@@ -11,7 +11,7 @@ from sqlite3 import OperationalError
 #saves the api loaded
 resultsDict          = {}
 create_tables_file   = "../create_tables.sql"
-drop_tabes_file      = "../drop_tables.sql"
+drop_tables_file     = "../drop_tables.sql"
 populate_tables_file = "../povoamento.sql"
 sql_insert           = "insert into TABLE values (VALUES);"
 
@@ -20,8 +20,11 @@ def main():
     connection = connect_oracle()
     if connection == None:
         print("Error connecting to oracleDB...")
+    load_sql_file(connection, drop_tables_file)
+    load_sql_file(connection, create_tables_file)
     load_api_to_dict()
     load_datastructures_to_file(populate_tables_file)
+    load_sql_file(connection, populate_tables_file)
 
 def load_datastructures_to_file(file_name):
     
@@ -38,10 +41,8 @@ def load_datastructures_to_file(file_name):
         # Create only one system (for now)
         if careteamid == 1:
             system_val = "{}, {}".format(systemid, resultsDict[key]["number_of_sensors"])
-
-        sql_system = sql_insert.replace("TABLE", "system").replace("VALUES", system_val)
-        
-        f.write("{}\n".format(sql_system))
+            sql_system = sql_insert.replace("TABLE", "system").replace("VALUES", system_val)
+            f.write("{}\n".format(sql_system))
 
         careteam_val = "{}".format(careteamid)
         sql_careteam = sql_insert.replace("TABLE", "careteam").replace("VALUES", careteam_val)
@@ -106,15 +107,6 @@ def load_datastructures_to_file(file_name):
 
     print("SQL file generated ('", populate_tables_file, "')!")
 
-def load_tables(connection):
-    print("\nLoading tables with data...")
-    sql_example = 'insert into doctor values(1, \'Joaquim\')'
-    with connection.cursor() as cursor:
-        cursor.execute(sql_example)
-        connection.commit()
-        cursor.close()
-    print("Tables loaded!")
-
 def load_sql_file(connection, file_name):
     print("\nLoading sql file: {}".format(file_name))
     fd = open(file_name, 'r')
@@ -129,9 +121,11 @@ def load_sql_file(connection, file_name):
         try:
             with connection.cursor() as cursor:
                 cursor.execute(cmd)
+                connection.commit()
             print("\tSuccess!")
         except Exception as msg:
             print("\t\t(error) Last sql command Skipped...")
+    
     print("SQL file loaded!")
 
 def connect_oracle(): 
