@@ -1,3 +1,4 @@
+drop table MEDIDAS;
 drop table SENSOR;
 drop table CARETEAM_HAS_DOCTOR;
 drop table CARETEAM;

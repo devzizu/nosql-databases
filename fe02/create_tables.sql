@@ -41,22 +41,29 @@ CREATE TABLE sensor
 (
 	sensorid int NOT NULL ENABLE,
 	careteamid int not null enable,
-    	patientid int not null enable,
-    	systemid int not null enable,
-    	sensornum int,
-    	type_of_sensor VARCHAR2(45 byte),
-    	servicecod VARCHAR2(45 byte),
-    	servicedesc VARCHAR2(100 byte),
-    	admdate DATE,
-    	bed int,
-    	bodytemp int,
-    	bloodpress_systolic int,
-    	bloodpress_diastolic int,
-    	bpm int,
-    	sato2 int,
-    	timest timestamp, 
-    	CONSTRAINT SENSORID_PK PRIMARY KEY (sensorid),
+	patientid int not null enable,
+	systemid int not null enable,
+	sensornum int,
+	type_of_sensor VARCHAR2(45 byte),
+	servicecod VARCHAR2(45 byte),
+	servicedesc VARCHAR2(100 byte),
+	admdate DATE,
+	bed int,
+	CONSTRAINT SENSORID_PK PRIMARY KEY (sensorid),
 	CONSTRAINT CARETEAMFK FOREIGN KEY (careteamid) REFERENCES careteam(careteamid) enable,
-    	CONSTRAINT PATIENTFK FOREIGN KEY (patientid) REFERENCES patient(patientid) enable,
+	CONSTRAINT PATIENTFK FOREIGN KEY (patientid) REFERENCES patient(patientid) enable,
 	CONSTRAINT SYSTEMFK FOREIGN KEY (systemid) REFERENCES system(systemid) enable
+);
+
+CREATE TABLE medidas
+(
+	timest timestamp NOT NULL ENABLE,
+	sensor_id int NOT NULL ENABLE,
+	bodytemp int,
+	bloodpress_systolic int,
+	bloodpress_diastolic int,
+	bpm int,
+	sato2 int,
+	constraint SENSOR_FK foreign key(sensor_id) references sensor(sensorid) enable,
+	constraint TUPLE_FK_PK primary key (timest, sensor_id)
 );
