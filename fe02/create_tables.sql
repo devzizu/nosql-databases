@@ -55,15 +55,15 @@ CREATE TABLE sensor
 	CONSTRAINT SYSTEMFK FOREIGN KEY (systemid) REFERENCES system(systemid) enable
 );
 
-CREATE TABLE measures
+CREATE TABLE medidas
 (
 	timest timestamp NOT NULL ENABLE,
-	sensorid int NOT NULL ENABLE,
+	sensor_id int NOT NULL ENABLE,
 	bodytemp int,
 	bloodpress_systolic int,
 	bloodpress_diastolic int,
 	bpm int,
 	sato2 int,
-	constraint MEASURES_PK PRIMARY KEY (timest),
-	constraint SENSOR_FK FOREIGN KEY (sensorid) REFERENCES sensor(sensorid) enable
+	constraint SENSOR_FK foreign key(sensor_id) references sensor(sensorid) enable,
+	constraint TUPLE_FK_PK primary key (timest, sensor_id)
 );
