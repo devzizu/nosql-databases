@@ -20,7 +20,7 @@ def main():
 
     connect_mongodb()
     global DB
-    DB = MDB_CLIENT.example
+    DB = MDB_CLIENT.ficha3
 
     # create/switch to collection
     bloodCollection = DB.blood
@@ -53,10 +53,7 @@ def update_collection(collection):
         medidaNova["bpm"] = request["bpm"]
         medidaNova["sato2"] = request["sato2"]
         
-        arrayMedidas = list(collection.find({"sensorid": request["sensorid"]}, {"_id": 0, "medida": 1})[0]["medida"])
-        arrayMedidas.append(medidaNova)
-
-        collection.update_one({"sensorid": request["sensorid"]}, {"$set": { "medida": arrayMedidas}})
+        collection.update_one({"sensorid": request["sensorid"]}, {"$push": { "medida": medidaNova}})
 
     print("[COLLECTION] done update!")
 
