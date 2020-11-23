@@ -1,5 +1,5 @@
-insert into medidas values (to_timestamp('2020-11-11 15:22:45', 'YYYY-MM-DD HH24:MI:SS'), 3001, 35, 154, 92, 119, 95);
-insert into medidas values (to_timestamp('2020-11-11 15:22:45', 'YYYY-MM-DD HH24:MI:SS'), 3002, 36, 156, 96, 108, 95);
-insert into medidas values (to_timestamp('2020-11-11 15:22:45', 'YYYY-MM-DD HH24:MI:SS'), 3003, 36, 158, 96, 114, 99);
-insert into medidas values (to_timestamp('2020-11-11 15:22:45', 'YYYY-MM-DD HH24:MI:SS'), 3004, 36, 167, 75, 106, 99);
-insert into medidas values (to_timestamp('2020-11-11 15:22:45', 'YYYY-MM-DD HH24:MI:SS'), 3005, 36, 148, 77, 113, 97);
+insert into medidas values (to_date('2020-11-23T13:37:15Z', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), 3001, 37, 143, 80, 118, 97);
+insert into medidas values (to_date('2020-11-23T13:37:15Z', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), 3002, 35, 147, 73, 109, 99);
+insert into medidas values (to_date('2020-11-23T13:37:16Z', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), 3003, 37, 131, 90, 101, 98);
+insert into medidas values (to_date('2020-11-23T13:37:16Z', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), 3004, 38, 137, 72, 102, 100);
+insert into medidas values (to_date('2020-11-23T13:37:16Z', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), 3005, 36, 148, 90, 114, 95);
