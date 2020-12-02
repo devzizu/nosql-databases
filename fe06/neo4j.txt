@@ -1,0 +1,44 @@
+/*1*/
+
+MATCH (c0:Customer)-->(:Product)<--(c1:Customer) return c0,c1
+
+/*2*/
+
+MATCH (c0:Customer)-->(:Product)<--(c1:Customer)MATCH (freeP:Product)WHERE (NOT ((c0)-->(freeP))) AND (c1)-->(freeP)return freeP
+
+/*3*/
+
+MATCH (p:Person)-[:ACTED_IN]->(:Movie{title:"The Matrix"})RETURN p
+
+/*4*/
+
+MATCH (p:Person{name:"Tom Hanks"})-[:ACTED_IN]->(m:Movie)RETURN m,p
+
+/*5*/
+
+MATCH (p:Person{name:"Tom Hanks"})-[:ACTED_IN]->(m:Movie)WHERE m.released >= 2000 RETURN m,p
+
+/*6*/
+
+MATCH (p:Person)-[:ACTED_IN]->(m:Movie)<-[:DIRECTED]-(p) RETURN p,m
+
+/*7*/
+
+MATCH (m:Movie)<-[role:ACTED_IN {roles:["Neo"]}]-(p:Person {name:"Keanu Reeves"}) RETURN m
+
+/*8*/
+
+MATCH (:Person)-[:ACTED_IN]->(:Movie)<-[:DIRECTED]-(p1:Person)RETURN Collect(distinct p1.name)
+
+/*9*/
+
+MATCH(p:Person)-[r:ACTED_IN]->(m:Movie) with p, count(m) as numMovies RETURN p.name, numMovies
+
+/*10*/
+
+MATCH (actor:Person)-[:ACTED_IN]->(m:Movie)<-[:DIRECTED]-(director:Person)WITH actor, director, count(m) as c
+RETURN actor.name, director.name, c
+
+/*11*/
+
+MATCH (p:Person)-[r:ACTED_IN]->(m:Movie) with p, count(m) as numMovies RETURN p.name,  numMovies ORDER BY numMovies DESC limit 5
