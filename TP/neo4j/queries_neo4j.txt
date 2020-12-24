@@ -1,0 +1,17 @@
+/*Number of employees who work in Canada*/
+
+match (c:Country)<-[:PERTENCE_A]-(l:Location)<-[:LOCALIZADO_EM]-(d:Department)
+-[:POSSUI]->(e:Employee) where c.country_name='Canada' return count(e)
+
+/*First and last name of the people whose actual job is Administration Vice 
+President*/
+
+match (e:Employee)-[d:DESEMPENHA]->(j:Job) where d.end_date is NULL and 
+j.job_title='Administration Vice President' return e.employee_first_name,
+e.employee_last_name
+
+/*ID and street address of the employees whose salary is higher than 10000*/
+
+match (l:Location)<-[:LOCALIZADO_EM]-(d:Department)-[:POSSUI]->(e:Employee) 
+where toInteger(e.employee_salary)>10000 return e.employee_id,l.street_address
+
