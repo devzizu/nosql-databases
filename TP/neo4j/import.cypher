@@ -28,3 +28,7 @@ CREATE (:Department { department_id: line.DEPARTMENT_ID, department_name: line.D
 LOAD CSV WITH HEADERS FROM "file:///departments_locations.csv" AS row
 MATCH (d:Department {department_id:row.DEPARTMENT_ID}), (l:Location {location_id:row.LOCATION_ID})
 CREATE (d)-[:LOCALIZADO_EM]->(l);
+
+//import jobs
+LOAD CSV WITH HEADERS FROM 'file:///jobs.csv' AS line
+CREATE (:Job { job_id: line.JOB_ID, job_title: line.JOB_TITLE, job_min_salary: line.MIN_SALARY, job_max_salary: line.MAX_SALARY})
