@@ -1,7 +1,8 @@
 /*Number of employees who work in Canada*/
 
 match (c:Country)<-[:PERTENCE_A]-(l:Location)<-[:LOCALIZADO_EM]-(d:Department)
--[:POSSUI]->(e:Employee) where c.country_name='Canada' return count(e)
+-[:POSSUI]->(e:Employee) where c.country_name='Canada' return count(e) as 
+`Number of employees who work in Canada`
 
 /*First and last name of the people whose actual job is Administration Vice 
 President*/
@@ -14,4 +15,28 @@ e.employee_last_name
 
 match (l:Location)<-[:LOCALIZADO_EM]-(d:Department)-[:POSSUI]->(e:Employee) 
 where toInteger(e.employee_salary)>10000 return e.employee_id,l.street_address
+
+
+
+
+
+
+
+
+
+
+
+
+/*Name of the region and number of departments of the region which has the
+largest number of departments*/
+
+match (r:Region)<-[:SITUADO_EM]-(c:Country)<-[:PERTENCE_A]-(l:Location)
+<-[:LOCALIZADO_EM]-(d:Department) return r.region_name, count(d) as `Number of departments` order 
+by count(d) desc limit 1
+
+/*Department names and mean of its salaries with 2 decimal places*/
+
+match (e:Employee)<-[:POSSUI]-(d:Department) return d.department_name
+, round(10^2*avg(toInteger(e.employee_salary)))/10^2 as `Mean of the 
+department's salaries`
 
