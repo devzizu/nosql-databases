@@ -34,16 +34,3 @@ largest number of departments*/
 match (r:Region)<-[:SITUADO_EM]-(c:Country)<-[:PERTENCE_A]-(l:Location)
 <-[:LOCALIZADO_EM]-(d:Department) return r.region_name, count(d) as 
 `Number of departments` order by count(d) desc limit 1
-
-
-
-
-
-
-
-
-
-
-
-
-
