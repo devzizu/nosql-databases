@@ -1,0 +1,7 @@
+[oracle]
+user     = hr
+host     = localhost
+service  = orclpdb1.localdomain
+passwd   = newpassword
+port     = 1521
+encoding = UTF-8
