@@ -128,8 +128,7 @@ def init_migrate_data():
 
                     if not (count_atual_reg_id is None):
                         EMP_RECORD["curr_dep_region_name"] = regionsRows[count_atual_reg_id][1]
-            
-             
+
             # Parse job history rows
         
             EMP_RECORD["hist"] = []

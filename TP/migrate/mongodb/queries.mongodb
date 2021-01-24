@@ -3,10 +3,16 @@
 db.employees.find({ "curr_dep_country_name": "Canada" }).size()
 
 # Query 2: First and last name of the people whose actual job is Administration Vice President
-db.employees.find({ "job_title": "Administration Vice President" }, { "first_name": 1, "last_name" : 1, "_id": 0}).pretty()
+db.employees.find({ "job_title": "Administration Vice President" }, { "First Name": "$first_name", "Last Name": "$last_name", "_id": 0 }).pretty()
 
 # Query 3: Employees who had more than one job before
-db.employees.find({ $where: "this.hist.length > 1" }, { "first_name": 1, "last_name": 1, "_id": 0 }).pretty()
+db.employees.find({ $where: "this.hist.length > 1" }, { "First Name": "$first_name", "Last Name": "$last_name", "_id": 0 }).pretty()
 
 # Query 4: Department names and mean of its salaries with 2 decimal places
+db.employees.aggregate( [ { $group: { _id: "$curr_dep_name", avgAmount: { $avg: "$salary" } } }, { $project: { _id: 0, "Departament": "$_id", "Average Salary": { $round: ["$avgAmount", 2] } }} ] ).pretty()
 
+# Query 5: ID and street address of the employees whose salary is higher than 10000
+db.employees.find({ "salary": { $gt: 10000 } }, { "E-mail": "$email", "Street Address": "$curr_dep_loc_st_addr", _id: 0}).pretty()
+
+# Query 6: Name of the region and number of departments of the region which has the largest number of departments
+db.employees.aggregate( [ { $group: { _id: "$curr_dep_region_name", dep_name: { $addToSet: "$curr_dep_name" }} } ] ).pretty()
