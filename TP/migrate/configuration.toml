@@ -5,3 +5,6 @@ service  = orclpdb1.localdomain
 passwd   = newpassword
 port     = 1521
 encoding = UTF-8
+
+[mongodb]
+uri      = mongodb://localhost:27017

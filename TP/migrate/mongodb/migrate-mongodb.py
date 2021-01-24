@@ -3,6 +3,7 @@ import cx_Oracle
 import configparser
 
 from pprint import pprint
+from pymongo import MongoClient
 
 def main():
 
@@ -10,18 +11,46 @@ def main():
     setup_config("../configuration.toml")
     
     # create oracle connection
-    create_oracle_connection()
-    
+    if not create_oracle_connection():
+        return
+    # create global migrate data (EMP_JOB_REC)
     init_migrate_data()
-    
     # close oracle connection
     close_oracle_connection()
 
-    print("done.")
+    # create mongodb client 
+    init_mongodb_migrate()    
+    # migrate generated data
+    migrate_documents()
+
+    print("[run] done.")
+
+def migrate_documents():
+    for record in EMP_JOB_REC:
+        employeesCollection.insert_one(record)
+
+def init_mongodb_migrate():
+
+    print("[mongodb] setting up connection, status = ", end = "")
+    global MDB_CLIENT
+    MDB_CLIENT = MongoClient(CONFIG['mongodb']['uri'])
+    print("ok", MDB_CLIENT.server_info()['ok'])
+
+    global HR_DB
+    HR_DB = MDB_CLIENT.hr_migrate
+
+    global employeesCollection
+    # create/switch collection
+    employeesCollection = HR_DB.employees
+    # clear all documents
+    employeesCollection.delete_many({})
 
 def init_migrate_data():
     
+    print("[migrate-data] generating migrate documents...")
+
     global EMP_JOB_REC
+    EMP_JOB_REC = []
  
     cursor = ORA_CONN.cursor()
 
@@ -54,14 +83,13 @@ def init_migrate_data():
     regionsRows = dict(map(lambda row: (row[0], row), cursor.fetchall()))
 
     for jb in jobsRows.values():
-        
-        LIST_RECORDS = []
-        EMP_RECORD = {}
 
         job_id         = jb[0]
         
         for emp in employeesRows.values():
 
+            EMP_RECORD = {}
+            
             emp_id = emp[0]
             
             # Parse current job information
@@ -104,12 +132,11 @@ def init_migrate_data():
              
             # Parse job history rows
         
-            entered = False
+            EMP_RECORD["hist"] = []
+
             for jb_hist in jobHistoryRows:
                 
                 if (jb_hist[0] == emp_id):
-
-                    entered = True
 
                     TMP_EMP_RECORD = {}
 
@@ -136,17 +163,14 @@ def init_migrate_data():
                                 TMP_EMP_RECORD["hist_dep_region_name"] = regionsRows[count_hist_reg_id][1]
 
     
-                    TMP_EMP_RECORD.update(EMP_RECORD)
-                    LIST_RECORDS.append(TMP_EMP_RECORD)                
+                    EMP_RECORD["hist"].append(TMP_EMP_RECORD)                
 
-                    
-            if (entered == False):
-                LIST_RECORDS.append(EMP_RECORD)
-
-            pprint(LIST_RECORDS)
+            EMP_JOB_REC.append(EMP_RECORD)    
     
+    print("[migrate-data] all data was generated.")
+
 def create_oracle_connection():
-    print("creating connection")
+    print("[oracle] creating connection, status = ", end="")
     host  = CONFIG['oracle']['host']
     port  = CONFIG['oracle']['port']
     sname = CONFIG['oracle']['service']
@@ -163,8 +187,10 @@ def create_oracle_connection():
         print("ok, version: ", ORA_CONN.version)
     
     except cx_Oracle.Error as error:
-        print(error)
+        print("error (is your database disconnected?)")
+        return False
 
+    return True
 
 def close_oracle_connection():
     if ORA_CONN:
@@ -172,7 +198,7 @@ def close_oracle_connection():
 
 def setup_config(path):
     
-    print("reading config...")
+    print("[config] reading", path)
     global CONFIG
     CONFIG = configparser.ConfigParser()
     CONFIG.read(path)
