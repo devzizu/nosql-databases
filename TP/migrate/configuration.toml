@@ -8,3 +8,13 @@ encoding = UTF-8
 
 [mongodb]
 uri      = mongodb://localhost:27017
+
+[neo4j]
+uri      = bolt://localhost:7687
+user     = neo4j
+passwd   = test
+
+[vm]
+host     = localhost
+user     = root
+passwd   = uminho!2020

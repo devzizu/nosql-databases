@@ -192,6 +192,7 @@ def create_oracle_connection():
     return True
 
 def close_oracle_connection():
+    print("[oracle] closing connection...")
     if ORA_CONN:
         ORA_CONN.close()
 
