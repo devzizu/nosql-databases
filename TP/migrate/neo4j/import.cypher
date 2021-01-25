@@ -1,3 +1,6 @@
+//remove all
+match (n) detach delete n
+
 //import countries
 LOAD CSV WITH HEADERS FROM 'file:///gen_csv/countries.csv' AS line
 CREATE (:Country { country_id: line.COUNTRY_ID, country_name: line.COUNTRY_NAME})

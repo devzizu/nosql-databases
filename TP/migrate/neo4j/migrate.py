@@ -23,7 +23,7 @@ def main():
     print("[run] done.")
 
 def migrate_neo4j():
-        
+    print("[neo4j] migrating data...")        
     fd = open(IMPORT_CYPHER, "r")
     lines = fd.readlines()
 
@@ -37,7 +37,7 @@ def migrate_neo4j():
                 AcumLine = ""
             if not (line.startswith("//") or len(line) == 0):
                 AcumLine = AcumLine + line
-
+        
         for query in ParsedLines:
             graphDB_Session.run(query)
 
