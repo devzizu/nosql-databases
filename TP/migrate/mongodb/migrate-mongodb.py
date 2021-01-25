@@ -26,6 +26,7 @@ def main():
     print("[run] done.")
 
 def migrate_documents():
+    print("[migrate] migrating documents...")
     for record in EMP_JOB_REC:
         employeesCollection.insert_one(record)
 

@@ -5,11 +5,13 @@ import csv
 import glob
 import os
 
+import shutil
 from pprint import pprint
 from neo4j import GraphDatabase
 
 GEN_CSV_FOLDER = "gen_csv"
 INIT_SQL       = "init.sql"
+EXPORT_FOLDER  = "/var/lib/neo4j/import/gen_csv"
 
 def main():
 
@@ -28,24 +30,24 @@ def main():
     close_oracle_connection()
 
     # send to VM /var/lib
-    send_csv_vm()
+    export_csv(EXPORT_FOLDER)
 
     print("[run] done.")
 
-def send_csv_vm():
-    print("[vm] exporting data to vm...")
-    host   = CONFIG['vm']['host']
-    user   = CONFIG['vm']['user']
-    passwd = CONFIG['vm']['passwd']
-
-    cmd = "sshpass -p '{}' scp -P 2222 -r {}/ {}@{}:/var/lib/neo4j/import".format(passwd, GEN_CSV_FOLDER,user, host)
-    os.system(cmd)
+def export_csv(dest):
+    if (os.path.exists(dest)):
+        shutil.rmtree(dest)
+    print("[csv] exporting data to", dest)
+    shutil.copytree(GEN_CSV_FOLDER, EXPORT_FOLDER)
 
 def clear_folder(name):
     print("[os] clearing folder", name)
-    files = glob.glob(name + "/*")
-    for f in files:
-        os.remove(f)
+    if not (os.path.exists(name)):
+        os.makedirs(name)
+    else:
+        files = glob.glob(name + "/*")
+        for f in files:
+            os.remove(f)
 
 def parse_generate_csv(filename):
     print("[parser] parsing file", filename)
