@@ -13,8 +13,3 @@ uri      = mongodb://localhost:27017
 uri      = bolt://localhost:7687
 user     = neo4j
 passwd   = test
-
-[vm]
-host     = localhost
-user     = root
-passwd   = uminho!2020
