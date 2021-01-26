@@ -22,7 +22,7 @@ count(j.job_id)>1;
 select department_name, round(avg(salary),2) as 
 "Mean of the department's salaries" from departments d join employees e on 
 d.department_id = e.department_id group by department_name;
-
+    
 /*ID and street address of the employees whose salary is higher than 10000*/
 
 select employee_id, street_address from employees e join departments d on 
