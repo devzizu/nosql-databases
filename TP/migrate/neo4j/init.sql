@@ -37,5 +37,7 @@ select * from regions | regions
 --employees_relationship.csv (join the results into one)
 --ALTER TABLE employees ADD END_DATE DATE
 
---select employee_id, job_id, hire_date as "START_DATE", end_date from employees | EMP_REL_1
---select employee_id, job_id, start_date, end_date from job_history | EMP_REL_2
+--select employee_id, job_id, hire_date as "START_DATE", department_id from employees | EMP_REL_1
+--select employee_id, job_id, start_date, end_date, department_id from job_history | EMP_REL_2
+select e.EMPLOYEE_ID, e.JOB_ID as "CurrentJob", j.JOB_ID as "PreviousJob", e.HIRE_DATE as "HireDate", j.START_DATE as "HistStartDate", j.END_DATE as "HistEndDate", e.DEPARTMENT_ID as "CurrentDep", j.DEPARTMENT_ID as "PreviousDep" from EMPLOYEES e full outer join JOB_HISTORY j on e.EMPLOYEE_ID = j.EMPLOYEE_ID | EMP_RELATION
+

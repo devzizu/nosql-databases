@@ -37,7 +37,7 @@ def migrate_neo4j():
                 AcumLine = ""
             if not (line.startswith("//") or len(line) == 0):
                 AcumLine = AcumLine + line
-        
+
         for query in ParsedLines:
             graphDB_Session.run(query)
 

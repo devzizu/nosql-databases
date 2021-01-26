@@ -22,7 +22,7 @@ LOAD CSV WITH HEADERS FROM 'file:///gen_csv/jobs.csv' AS line
 CREATE (:Job { job_id: line.JOB_ID, job_title: line.JOB_TITLE, job_min_salary: line.MIN_SALARY, job_max_salary: line.MAX_SALARY})
 
 //import employees
-LOAD CSV WITH HEADERS FROM 'file:///gen_csv/employees.csv' AS line FIELDTERMINATOR ';'
+LOAD CSV WITH HEADERS FROM 'file:///gen_csv/employees.csv' AS line FIELDTERMINATOR ','
 CREATE (:Employee { employee_id: line.EMPLOYEE_ID, employee_first_name: line.FIRST_NAME, employee_last_name: line.LAST_NAME, employee_email: line.EMAIL, employee_phone_number: line.PHONE_NUMBER, employee_salary: line.SALARY, employee_commission_pct: line.COMMISSION_PCT})
 
 //import relationship between country and region
@@ -56,6 +56,7 @@ MATCH (d:Department {department_id:row.DEPARTMENT_ID}), (e:Employee {employee_id
 CREATE (d)-[:POSSUI]->(e);
 
 //import relationship between employee and job
-//LOAD CSV WITH HEADERS FROM "file:///gen_csv/employees_relationship.csv" AS csvLine
-//MATCH (e:Employee {employee_id: csvLine.EMPLOYEE_ID}),(j:Job {job_id: csvLine.JOB_ID})
-//CREATE (e)-[:DESEMPENHA {start_date: csvLine.START_DATE, end_date: csvLine.END_DATE}]->(j)
+LOAD CSV WITH HEADERS FROM "file:///gen_csv/employees_relationship.csv" AS csvLine
+MATCH (e:Employee {employee_id: csvLine.EMPLOYEE_ID}),(j:Job {job_id: csvLine.JOB_ID})
+CREATE (e)-[:DESEMPENHA {start_date: csvLine.START_DATE, end_date: csvLine.END_DATE, department_id: csvLine.DEPARTMENT_ID}]->(j);
+
