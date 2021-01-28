@@ -1,3 +1,0 @@
-sudo apt install python3-toml
-pip3 install toml
-pip3 instlal cx_Oracle
