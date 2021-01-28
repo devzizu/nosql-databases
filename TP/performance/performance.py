@@ -8,6 +8,7 @@ import csv
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
 from pprint import pprint
 from pymongo import MongoClient
@@ -21,7 +22,7 @@ QUERIES_CYPHER  = "queries_neo4j.cypher"
 # output csv folder
 OUTPUT_FOLDER   = "results"
 # number of tests for each query
-NUMBER_EXEC     = 30
+NUMBER_EXEC     = int(sys.argv[1])
 # multiply nanoseconds by factor
 FACTOR = pow(10,6)
 # round n decimal places
@@ -43,8 +44,8 @@ def main():
 
     # run performance tests
 
-    performance_oracle(QUERIES_FOLDER + "/" + QUERIES_ORACLE)
     performance_neo4j(QUERIES_FOLDER + "/" + QUERIES_CYPHER)
+    performance_oracle(QUERIES_FOLDER + "/" + QUERIES_ORACLE)
     performance_mongodb(QUERIES_FOLDER + "/" + QUERIES_MONGODB)
 
     plot_all()
@@ -168,11 +169,13 @@ def performance_oracle(queries_file):
 
 def plot_csv(x, y, db):
 
+    _id = 1
     for qid in range(0, 6):   
         query = "query{}".format(qid)
         df = pd.read_csv("results/{}-{}.csv".format(db, query))
-        axs[x,y].plot(df["test#"], df["time"], label=query)
+        axs[x,y].plot(df["test#"], df["time"], label="query{}".format(_id), linewidth=1)
         axs[x,y].legend()
+        _id = _id + 1
 
     axs[x,y].set_title("dbms: {}".format(db))
 
@@ -182,8 +185,11 @@ def plot_all():
     global axs, fig
     fig, axs = plt.subplots(2,2, figsize=(15, 15))
 
-    plt.setp(axs, xticks=np.arange(0,NUMBER_EXEC,2).tolist())
+    fig.suptitle("Performance tests")
 
+    #plt.setp(axs, xticks=np.arange(0,NUMBER_EXEC,2).tolist())
+    plt.setp(axs, xticks=np.arange(0,NUMBER_EXEC, NUMBER_EXEC/10))
+    
     for ax in axs.flat:
         ax.set(xlabel="Execution ID", ylabel="Time (ms)")
     
