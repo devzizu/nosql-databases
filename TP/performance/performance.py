@@ -24,7 +24,7 @@ OUTPUT_FOLDER   = "results"
 # number of tests for each query
 NUMBER_EXEC     = int(sys.argv[1])
 # multiply nanoseconds by factor
-FACTOR = pow(10,6)
+FACTOR = pow(10,3)
 # round n decimal places
 ROUND = 6
 
@@ -86,9 +86,9 @@ def performance_mongodb(queries_file):
             queryE = "query{}".format(queryid)
             TESTS_MAP[queryE] = []
             for testid in range(0,NUMBER_EXEC):
-                start  = time.process_time()
+                start  = time.time()
                 result = eval(query)
-                end    = time.process_time() - start
+                end    = time.time() - start
                 TESTS_MAP[queryE].append(round(end * FACTOR, ROUND)) 
             values = TESTS_MAP[queryE]
             avg = round((sum(values)/ len(values)), ROUND)
@@ -123,9 +123,9 @@ def performance_neo4j(queries_file):
             queryE = "query{}".format(queryid)
             TESTS_MAP[queryE] = []
             for testid in range(0,NUMBER_EXEC):
-                start  = time.process_time()
+                start  = time.time()
                 result = graphDB_Session.run(query)
-                end    = time.process_time() - start
+                end    = time.time() - start
                 TESTS_MAP[queryE].append(round(end * FACTOR, ROUND)) 
             values = TESTS_MAP[queryE]
             avg = round((sum(values)/ len(values)), ROUND)
@@ -155,9 +155,9 @@ def performance_oracle(queries_file):
         TESTS_MAP[queryE] = []
 
         for testid in range(0, NUMBER_EXEC):
-            start = time.process_time()
+            start = time.time()
             r = CURSOR.execute(query).fetchall()
-            end   = time.process_time() - start
+            end   = time.time() - start
             TESTS_MAP[queryE].append(round(end * FACTOR, ROUND))
 
         values = TESTS_MAP[queryE]
