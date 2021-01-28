@@ -52,7 +52,7 @@ def main():
 
 
     # close connections
-    close_neo4j_connection
+    close_neo4j_connection()
     close_oracle_connection()
 
     print("[run] done.")
