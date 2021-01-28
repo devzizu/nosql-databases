@@ -4,8 +4,7 @@ match (c:Country)<-[:PERTENCE_A]-(l:Location)<-[:LOCALIZADO_EM]-(d:Department)
 -[:POSSUI]->(e:Employee) where c.country_name='Canada' return count(e) as 
 `Number of employees who work in Canada`
 
-/*First and last name of the people whose actual job is Administration Vice 
-President*/
+/*First and last name of the people whose actual job is Administration Vice President*/
 
 match (e:Employee)-[d:DESEMPENHA]->(j:Job) where d.end_date is NULL and 
 j.job_title='Administration Vice President' return e.employee_first_name,
@@ -28,8 +27,7 @@ department's salaries`
 match (l:Location)<-[:LOCALIZADO_EM]-(d:Department)-[:POSSUI]->(e:Employee) 
 where toInteger(e.employee_salary)>10000 return e.employee_id,l.street_address
 
-/*Name of the region and number of departments of the region which has the
-largest number of departments*/
+/*Name of the region and number of departments of the region which has the largest number of departments*/
 
 match (r:Region)<-[:SITUADO_EM]-(c:Country)<-[:PERTENCE_A]-(l:Location)
 <-[:LOCALIZADO_EM]-(d:Department) return r.region_name, count(d) as 
@@ -37,4 +35,4 @@ match (r:Region)<-[:SITUADO_EM]-(c:Country)<-[:PERTENCE_A]-(l:Location)
 
 
 /* Extra - Demonstrações */
-match (dep:Department) with dep as Departs match (e:Employee) -[d:DESEMPENHA]->(j:Job) where e.employee_id = "101" and d.department_id in Departs.department_id and d.end_date <> "null" return Departs
+/*match (dep:Department) with dep as Departs match (e:Employee) -[d:DESEMPENHA]->(j:Job) where e.employee_id = "101" and d.department_id in Departs.department_id and d.end_date <> "null" return Departs*/
