@@ -21,7 +21,7 @@ QUERIES_CYPHER  = "queries_neo4j.cypher"
 # output csv folder
 OUTPUT_FOLDER   = "results"
 # number of tests for each query
-NUMBER_EXEC     = 20
+NUMBER_EXEC     = 30
 # multiply nanoseconds by factor
 FACTOR = pow(10,6)
 # round n decimal places
@@ -38,16 +38,16 @@ def main():
     if not create_oracle_connection():
         return
     create_neo4j_connection()
-
+    create_mongodb_connection()
 
 
     # run performance tests
 
     performance_oracle(QUERIES_FOLDER + "/" + QUERIES_ORACLE)
     performance_neo4j(QUERIES_FOLDER + "/" + QUERIES_CYPHER)
+    performance_mongodb(QUERIES_FOLDER + "/" + QUERIES_MONGODB)
 
-    #plot_all()
-
+    plot_all()
 
 
     # close connections
@@ -55,6 +55,46 @@ def main():
     close_oracle_connection()
 
     print("[run] done.")
+
+def performance_mongodb(queries_file):
+
+    print("[mongodb] performing tests for mongodb queries...")
+
+    queries = []
+
+    lines = open(queries_file, "r").readlines()
+    AcumLine = ""
+    ParsedLines = []
+    for line in lines:
+        # if its not comment
+        if (line.startswith("\n")):
+            ParsedLines.append(AcumLine)
+            AcumLine = ""
+        if not (line.startswith("#") or len(line) == 0):
+            AcumLine = AcumLine + line
+ 
+    for query in ParsedLines:
+        if (len(query) > 1):
+            queries.append(query.replace("db", "HR_DB").replace("employees", "employeesCollection").replace(".size()", "").replace(".pretty()", "").replace("$where","\"$where\"").replace("$group", "\"$group\"").replace("$round","\"$round\"").replace("$avg:","\"$avg\":").replace("$project", "\"$project\"").replace("_id:","\"_id\":").replace("avgAmount:", "\"avgAmount\":").replace("$gt","\"$gt\"").replace("$addToSet", "\"$addToSet\"").replace("dep_name:", "\"dep_name\":"))
+
+    TESTS_MAP = {}
+
+    queryid = 0
+    for query in queries:
+        if len(query) > 1:
+            queryE = "query{}".format(queryid)
+            TESTS_MAP[queryE] = []
+            for testid in range(0,NUMBER_EXEC):
+                start  = time.process_time()
+                result = eval(query)
+                end    = time.process_time() - start
+                TESTS_MAP[queryE].append(round(end * FACTOR, ROUND)) 
+            values = TESTS_MAP[queryE]
+            avg = round((sum(values)/ len(values)), ROUND)
+            print("[query-{}] {} executions, average time = {}".format(queryid, NUMBER_EXEC, avg))
+            filename = "{}/mongodb-query{}.csv".format(OUTPUT_FOLDER, queryid)
+            create_csv(TESTS_MAP[queryE], filename)
+            queryid = queryid + 1
 
 def performance_neo4j(queries_file):
 
@@ -74,34 +114,24 @@ def performance_neo4j(queries_file):
             if not (line.startswith("/*") or len(line) == 0):
                 AcumLine = AcumLine + line
     
-    for query in ParsedLines:
-        if len(query) > 1:
-            print("----------------------------------------------------------")
-            print(query)
-            graphDB_Session.run(query)
-
-"""
     TESTS_MAP = {}
 
     queryid = 0
-    for query in queries:
-
-        queryE = "query{}".format(queryid)
-        TESTS_MAP[queryE] = []
-
-        for testid in range(0, NUMBER_EXEC):
-            start = time.process_time()
-            CURSOR.execute(query).fetchall()
-            end   = time.process_time() - start
-            TESTS_MAP[queryE].append(round(end * FACTOR, ROUND))
-
-        values = TESTS_MAP[queryE]
-        avg = round((sum(values)/ len(values)), ROUND)
-        print("[query-{}] {} executions, average time = {}".format(queryid, NUMBER_EXEC, avg))
-        filename = "{}/oracle-query{}.csv".format(OUTPUT_FOLDER, queryid)
-        create_csv(TESTS_MAP[queryE], filename)
-        queryid = queryid + 1
-"""
+    for query in ParsedLines:
+        if len(query) > 1:
+            queryE = "query{}".format(queryid)
+            TESTS_MAP[queryE] = []
+            for testid in range(0,NUMBER_EXEC):
+                start  = time.process_time()
+                result = graphDB_Session.run(query)
+                end    = time.process_time() - start
+                TESTS_MAP[queryE].append(round(end * FACTOR, ROUND)) 
+            values = TESTS_MAP[queryE]
+            avg = round((sum(values)/ len(values)), ROUND)
+            print("[query-{}] {} executions, average time = {}".format(queryid, NUMBER_EXEC, avg))
+            filename = "{}/neo4j-query{}.csv".format(OUTPUT_FOLDER, queryid)
+            create_csv(TESTS_MAP[queryE], filename)
+            queryid = queryid + 1
 
 def performance_oracle(queries_file):
 
@@ -125,7 +155,7 @@ def performance_oracle(queries_file):
 
         for testid in range(0, NUMBER_EXEC):
             start = time.process_time()
-            CURSOR.execute(query).fetchall()
+            r = CURSOR.execute(query).fetchall()
             end   = time.process_time() - start
             TESTS_MAP[queryE].append(round(end * FACTOR, ROUND))
 
@@ -142,8 +172,9 @@ def plot_csv(x, y, db):
         query = "query{}".format(qid)
         df = pd.read_csv("results/{}-{}.csv".format(db, query))
         axs[x,y].plot(df["test#"], df["time"], label=query)
+        axs[x,y].legend()
 
-    axs[0,0].set_title("dbms: {}".format(db))
+    axs[x,y].set_title("dbms: {}".format(db))
 
 
 def plot_all():
@@ -159,8 +190,8 @@ def plot_all():
     # view plots for each dbms
 
     plot_csv(0, 0, "oracle")
-    
-    
+    plot_csv(0, 1, "neo4j")
+    plot_csv(1, 0, "mongodb")    
 
     # display subplots
 
@@ -225,6 +256,21 @@ def close_oracle_connection():
     print("[oracle] closing connection...")
     if ORA_CONN:
         ORA_CONN.close()
+
+
+def create_mongodb_connection():
+
+    print("[mongodb] setting up connection, status = ", end = "")
+    global MDB_CLIENT
+    MDB_CLIENT = MongoClient(CONFIG['mongodb']['uri'])
+    print("ok", MDB_CLIENT.server_info()['ok'])
+
+    global HR_DB
+    HR_DB = MDB_CLIENT.hr_migrate
+
+    global employeesCollection
+    # create/switch collection
+    employeesCollection = HR_DB.employees
 
 def setup_config(path):
     

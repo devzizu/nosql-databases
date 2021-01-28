@@ -16,3 +16,4 @@ db.employees.find({ "salary": { $gt: 10000 } }, { "E-mail": "$email", "Street Ad
 
 # Query 6: Name of the region and number of departments of the region which has the largest number of departments
 db.employees.aggregate( [ { $group: { _id: "$curr_dep_region_name", dep_name: { $addToSet: "$curr_dep_name" }} } ] ).pretty()
+
