@@ -6,13 +6,13 @@ match (c:Country)<-[:PERTENCE_A]-(l:Location)<-[:LOCALIZADO_EM]-(d:Department)
 
 /*First and last name of the people whose actual job is Administration Vice President*/
 
-match (e:Employee)-[d:DESEMPENHA]->(j:Job) where d.end_date is NULL and 
+match (e:Employee)-[d:DESEMPENHA]->(j:Job) where d.end_date = "null" and 
 j.job_title='Administration Vice President' return e.employee_first_name,
 e.employee_last_name
 
 /*Employees who had more than one job before*/
 
-match (e:Employee)-[d:DESEMPENHA]->(j:Job) where d.end_date is not null
+match (e:Employee)-[d:DESEMPENHA]->(j:Job) where d.end_date <> "null"
 with e.employee_first_name as first_name, e.employee_last_name as last_name, 
 count(*) as n_jobs where n_jobs > 1 return first_name, last_name
 
